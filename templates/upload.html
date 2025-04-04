@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Model</title>
+</head>
+<style>
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #121212;
+    color: #fff;
+    text-align: center;
+    padding: 50px;
+}
+
+.container {
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.1);
+}
+
+input, button {
+    margin: 10px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #6200ea;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #3700b3;
+}
+
+#progress-container {
+    margin-top: 20px;
+    text-align: left;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    padding: 5px;
+    background: #333;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+
+</style>
+<body>
+    <div class="container">
+        <h2>Upload Model for Aggregation</h2>
+        <input type="file" id="modelFile" accept=".h5">
+        <button onclick="uploadModel()">Upload</button>
+
+        <div id="progress-container">
+            <h3>Upload Progress:</h3>
+            <ul id="progress-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        function uploadModel() {
+            const fileInput = document.getElementById("modelFile");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select a .h5 model file to upload.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            fetch("/upload_model", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    startProgressUpdates();
+                }
+            })
+            .catch(error => {
+                console.error("Error uploading file:", error);
+                alert("Upload failed.");
+            });
+        }
+
+        function startProgressUpdates() {
+            const progressList = document.getElementById("progress-list");
+            progressList.innerHTML = ""; // Clear previous messages
+
+            const eventSource = new EventSource("/progress");
+            
+            eventSource.onmessage = function(event) {
+                const newItem = document.createElement("li");
+                newItem.textContent = event.data;
+                progressList.appendChild(newItem);
+            };
+
+            eventSource.onerror = function() {
+                eventSource.close(); // Stop listening on error
+            };
+        }
+    </script>
+</body>
+</html>

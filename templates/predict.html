@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Detection System</title>
+    <style>
+        /* Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #121212;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            background: #1e1e1e;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            width: 60vw;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #2c2c2c;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus, select:focus {
+            background: #333;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: #00aaff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #0088cc;
+        }
+
+        .result {
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #downloadModelBtn {
+            background: #ff5733;
+        }
+
+        #downloadModelBtn:hover {
+            background: #cc4422;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔍 Fraud Detection</h2>
+        <input type="number" id="amount" placeholder="💰 Transaction Amount (INR)">
+        <input type="number" id="frequency" placeholder="📊 Transactions Per Week">
+        
+        <select id="time">
+            <option value="morning">⛅ Morning</option>
+            <option value="afternoon">☀️ Afternoon</option>
+            <option value="night">🌙 Night</option>
+        </select>
+        
+        <select id="transactionType">
+            <option value="P2P">🔄 Person to Person (P2P)</option>
+            <option value="P2M">🏪 Person to Merchant (P2M)</option>
+        </select>
+
+        <input type="text" id="location" placeholder="📍 Location (City, Country)">
+        
+        <button onclick="predictFraud()">🚀 Check Fraud</button>
+        <button id="downloadModelBtn">⬇️ Download Global Model</button>
+        
+        <p class="result" id="result"></p>
+    </div>
+
+    <script>
+        document.getElementById("downloadModelBtn").addEventListener("click", function() {
+            window.location.href = "/download_model";
+        });
+
+        function predictFraud() {
+            let amount = parseFloat(document.getElementById("amount").value);
+            let frequency = parseInt(document.getElementById("frequency").value);
+            let time = document.getElementById("time").value;
+            let transactionType = document.getElementById("transactionType").value;
+            let location = document.getElementById("location").value;
+
+            fetch("/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    amount: amount,
+                    frequency: frequency,
+                    time: time,
+                    transactionType: transactionType,
+                    location: location
+                })
+             })
+             .then(response => response.json())
+             .then(data => {
+                 if (data.error) {
+                     console.error("❌ Backend Error:", data.error);
+                     alert("Error: " + data.error);
+                 } else {
+                     document.getElementById("result").innerHTML = 
+                         `<h3>🔎 Prediction Result</h3>
+                          <p>Fraud Probability: <b>${data.fraud_probability.toFixed(4)}</b></p>
+                          <p>${data.is_fraud ? "🚨 <span style='color: red;'>This transaction is likely fraudulent!</span>" : "✅ <span style='color: lightgreen;'>This transaction seems safe.</span>"}</p>
+                          <p><b>Description:</b> ${data.ai_description ? data.ai_description : "⚠️ AI response unavailable."}</p>`;
+                 }
+             })
+             .catch(error => {
+                 console.error("❌ Fetch Error:", error);
+                 alert("Request failed! Check console for details.");
+             });
+        }
+    </script>
+</body>
+</html>
