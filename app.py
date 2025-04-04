@@ -185,7 +185,7 @@ def generate_gemini_response(fraud_probability, is_fraud, user_inputs):
     limit to 1500character.
     """
 
-    genai.configure(api_key="AIzaSyA3dqTBEjYqQ7bmq1cJhWcN081l78ldbSk")
+    genai.configure(api_key="GEMINI_API_KEY")
 
     model = genai.GenerativeModel('gemini-2.0-flash')
     try:
