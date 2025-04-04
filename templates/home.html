@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FedUPI - Federated Learning UPI Fraud Detection</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #7209b7;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --border: #333333;
+            --success: #4cc9f0;
+            --gradient: linear-gradient(135deg, var(--primary), var(--accent));
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-icon {
+            margin-right: 10px;
+            font-size: 32px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+            padding: 8px 0;
+            position: relative;
+        }
+        
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background: var(--gradient);
+            transition: width 0.3s;
+        }
+        
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+        
+        .hero {
+            padding-top: 120px;
+            padding-bottom: 80px;
+            display: flex;
+            flex-direction: row;
+            gap: 40px;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--background);
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(66, 97, 238, 0.1), transparent 60%);
+            z-index: 0;
+        }
+        
+        .hero-content {
+            flex: 1;
+            width: 50%;
+            padding-right: 40px;
+        }
+        
+        .hero-image {
+            flex: 1;
+            width: 50%;
+            justify-content: center;
+        }
+        
+        .hero-title {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 32px;
+            background: var(--gradient);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(66, 97, 238, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(66, 97, 238, 0.4);
+        }
+        
+        .feature-section {
+            padding: 100px 0;
+            background-color: var(--background);
+            position: relative;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 60px;
+            color: var(--text-primary);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--gradient);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+        
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .feature-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        
+        .feature-desc {
+            color: var(--text-secondary);
+        }
+        
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(rgba(18, 18, 18, 0.9), rgba(18, 18, 18, 0.9)), var(--gradient);
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('/api/placeholder/1200/800') center/cover no-repeat;
+            opacity: 0.05;
+            z-index: 0;
+        }
+        
+        .cta-title {
+            font-size: 36px;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-subtitle {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid white;
+        }
+        
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        footer {
+            background-color: #0a0a0a;
+            color: var(--text-primary);
+            padding: 60px 0 30px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column {
+            flex: 1;
+            margin-right: 40px;
+        }
+        
+        .footer-column:last-child {
+            margin-right: 0;
+        }
+        
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .footer-desc {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .footer-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Glow effects */
+        .glow {
+            position: relative;
+        }
+        
+        .glow::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: var(--gradient);
+            border-radius: 24px;
+            filter: blur(20px);
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s;
+        }
+        
+        .glow:hover::before {
+            opacity: 0.2;
+        }
+        
+        /* Animation */
+        @keyframes floatAnimation {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .floating {
+            animation: floatAnimation 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0% { filter: drop-shadow(0 0 5px rgba(66, 97, 238, 0.2)); }
+            50% { filter: drop-shadow(0 0 20px rgba(114, 9, 183, 0.4)); }
+            100% { filter: drop-shadow(0 0 5px rgba(66, 97, 238, 0.2)); }
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 4s infinite;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-content, .hero-image {
+                width: 100%;
+                padding-right: 0;
+            }
+            
+            .hero-image {
+                margin-top: 40px;
+            }
+            
+            .features {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-content {
+                flex-wrap: wrap;
+            }
+            
+            .footer-column {
+                flex: 1 0 50%;
+                margin-bottom: 30px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .footer-column {
+                flex: 1 0 100%;
+            }
+            
+            .hero-title {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <span class="logo-icon">⚡</span> FedUPI
+                </div>
+                <div class="nav-links">
+                    <a href="#home">Home</a>
+                    <a href="/upload">Update Model</a>
+                    <a href="/predict">Predict Fraud</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Federated Learning for UPI Fraud Detection</h1>
+                <p class="hero-subtitle">Secure, private, and efficient fraud detection system that leverages federated learning to protect UPI transactions while preserving user privacy.</p>
+                <div class="hero-buttons">
+                    <a href="/predict" class="btn pulse-glow">Detect Fraud</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <!-- <img src="block.png" alt="FedUPI Illustration" class="floating pulse-glow"> -->
+            </div>
+        </div>
+    </section>
+
+    <section class="feature-section" id="features">
+        <div class="container">
+            <h2 class="section-title">Key Features</h2>
+            <div class="features">
+                <div class="feature-card glow">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Privacy Preserving</h3>
+                    <p class="feature-desc">Keep sensitive financial data secure with federated learning technology that trains models without sharing raw data.</p>
+                </div>
+                <div class="feature-card glow">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Continuous Learning</h3>
+                    <p class="feature-desc">Our models constantly improve by learning from new transaction patterns while maintaining privacy.</p>
+                </div>
+                <div class="feature-card glow">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Advanced Analytics</h3>
+                    <p class="feature-desc">Gain insights into fraud patterns with comprehensive analytics and visualization tools.</p>
+                </div>
+                <div class="feature-card glow">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">Regulatory Compliance</h3>
+                    <p class="feature-desc">Stay compliant with financial regulations while implementing cutting-edge fraud detection.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2 class="cta-title">Ready to Enhance Your UPI Security?</h2>
+            <p class="cta-subtitle">Start using our federated learning platform to detect and prevent UPI fraud while preserving user privacy.</p>
+            <div class="cta-buttons">
+                <a href="/upload" class="btn">Update Model</a>
+                <a href="/predict" class="btn btn-outline">Predict Fraud</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <div class="footer-logo">FedUPI</div>
+                    <p class="footer-desc">A cutting-edge federated learning platform for UPI fraud detection that prioritizes security and privacy.</p>
+                </div>
+                <div class="footer-column">
+                    <h3 class="footer-title">Pages</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="/upload">Update Model</a></li>
+                        <li><a href="/predict">Predict Fraud</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                © 2025 FedUPI. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.style.backdropFilter = 'blur(15px)';
+                header.style.background = 'rgba(18, 18, 18, 0.95)';
+            } else {
+                header.style.backdropFilter = 'blur(10px)';
+                header.style.background = 'rgba(18, 18, 18, 0.8)';
+            }
+        });
+    </script>
+</body>
+</html>
